@@ -1,0 +1,21 @@
+{
+  "evidence": "Independent NumPy/SciPy simulation; no GNU Radio DSP or hardware execution",
+  "checks": {
+    "complex_tone_mean_square_0_04": true,
+    "am_envelope_min_max": true,
+    "am_sideband_to_carrier_amplitude_0_25": true,
+    "am_ideal_recovery_1khz_after_decimation": true,
+    "audio_rate_ratio_50": true,
+    "audio_envelope_headroom": true,
+    "filter_preserves_1khz_within_0_2db": true,
+    "filter_rejects_10khz_over_40db": true,
+    "half_amplitude_minus_6_0206db": true
+  },
+  "all_checks_passed": true,
+  "filter_6a": {
+    "tap_count": 57,
+    "desired_1khz_gain_db": 0.03080237670657902,
+    "unwanted_10khz_gain_db": -64.08857928606578
+  },
+  "ideal_am_recovery_peak_hz": 1001.865671641791
+}

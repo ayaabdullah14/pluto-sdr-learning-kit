@@ -1,0 +1,4 @@
+run,changed_variable,prediction,rf_center_hz,channel_offset_hz,sample_rate_sps,rx_gain_db,tx_atten_db,measurement,unit,observation,conclusion
+baseline,,,,,,,,,,,
+change_1,,,,,,,,,,,
+restore_baseline,,,,,,,,,,,

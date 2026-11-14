@@ -1,0 +1,275 @@
+options:
+  parameters:
+    title: Example 6A - Select one tone
+    author: Aya - SDR learning course
+    copyright: ''
+    description: ''
+    output_language: python
+    generate_options: qt_gui
+    gen_linking: dynamic
+    gen_cmake: 'On'
+    cmake_opt: ''
+    category: '[GRC Hier Blocks]'
+    run_options: prompt
+    placement: (0,0)
+    window_size: (1100,800)
+    sizing_mode: fixed
+    run: 'True'
+    max_nouts: '0'
+    realtime_scheduling: ''
+    qt_qss_theme: ''
+    thread_safe_setters: ''
+    catch_exceptions: 'True'
+    run_command: '{python} -u {filename}'
+    hier_block_src_path: '.:'
+    id: ex06a_filter_simulation
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 16
+    - 16
+    rotation: 0
+    state: enabled
+blocks:
+- name: samp_rate
+  id: variable
+  parameters:
+    value: '48000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 240
+    - 16
+    rotation: 0
+    state: enabled
+- name: desired_hz
+  id: variable
+  parameters:
+    value: '1000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 470
+    - 16
+    rotation: 0
+    state: enabled
+- name: unwanted_hz
+  id: variable
+  parameters:
+    value: '10000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 700
+    - 16
+    rotation: 0
+    state: enabled
+- name: desired_tone
+  id: analog_sig_source_x
+  parameters:
+    type: complex
+    samp_rate: samp_rate
+    waveform: analog.GR_COS_WAVE
+    freq: desired_hz
+    amp: '0.2'
+    offset: '0'
+    phase: '0'
+    showports: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 80
+    - 300
+    rotation: 0
+    state: enabled
+- name: unwanted_tone
+  id: analog_sig_source_x
+  parameters:
+    type: complex
+    samp_rate: samp_rate
+    waveform: analog.GR_COS_WAVE
+    freq: unwanted_hz
+    amp: '0.2'
+    offset: '0'
+    phase: '0'
+    showports: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 80
+    - 570
+    rotation: 0
+    state: enabled
+- name: combined_input
+  id: blocks_add_xx
+  parameters:
+    type: complex
+    num_inputs: '2'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 370
+    - 350
+    rotation: 0
+    state: enabled
+- name: simulation_clock
+  id: blocks_throttle2
+  parameters:
+    type: complex
+    samples_per_second: samp_rate
+    vlen: '1'
+    ignoretag: 'True'
+    limit: auto
+    maximum: '0.1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 650
+    - 350
+    rotation: 0
+    state: enabled
+- name: select_low_frequency
+  id: low_pass_filter
+  parameters:
+    type: fir_filter_ccf
+    decim: '1'
+    interp: '1'
+    gain: '1'
+    samp_rate: samp_rate
+    cutoff_freq: '3000'
+    width: '2000'
+    win: window.WIN_HAMMING
+    beta: '6.76'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 930
+    - 350
+    rotation: 0
+    state: enabled
+- name: before_after
+  id: qtgui_freq_sink_x
+  parameters:
+    type: complex
+    name: Before (red) and after (blue) filtering
+    fftsize: '4096'
+    freqhalf: 'False'
+    wintype: window.WIN_HANN
+    norm_window: 'False'
+    fc: '0'
+    bw: samp_rate
+    grid: 'True'
+    autoscale: 'False'
+    average: 'False'
+    ymin: '-120'
+    ymax: '10'
+    label: Digital spectral level
+    units: dB
+    nconnections: '2'
+    update_time: '0.15'
+    showports: 'False'
+    gui_hint: 0,0,1,1
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_level: '0.0'
+    tr_chan: '0'
+    tr_tag: '""'
+    ctrlpanel: 'False'
+    legend: 'True'
+    axislabels: 'True'
+    label1: Input
+    width1: '1'
+    color1: red
+    alpha1: '1.0'
+    label2: Filtered
+    width2: '1'
+    color2: blue
+    alpha2: '1.0'
+    label3: ''''''
+    width3: '1'
+    color3: '"green"'
+    alpha3: '1.0'
+    label4: ''''''
+    width4: '1'
+    color4: '"black"'
+    alpha4: '1.0'
+    label5: ''''''
+    width5: '1'
+    color5: '"cyan"'
+    alpha5: '1.0'
+    label6: ''''''
+    width6: '1'
+    color6: '"magenta"'
+    alpha6: '1.0'
+    label7: ''''''
+    width7: '1'
+    color7: '"yellow"'
+    alpha7: '1.0'
+    label8: ''''''
+    width8: '1'
+    color8: '"dark red"'
+    alpha8: '1.0'
+    label9: ''''''
+    width9: '1'
+    color9: '"dark green"'
+    alpha9: '1.0'
+    label10: ''''''
+    width10: '1'
+    color10: '"dark blue"'
+    alpha10: '1.0'
+    averaging: '1.0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1260
+    - 350
+    rotation: 0
+    state: enabled
+connections:
+- - desired_tone
+  - '0'
+  - combined_input
+  - '0'
+- - unwanted_tone
+  - '0'
+  - combined_input
+  - '1'
+- - combined_input
+  - '0'
+  - simulation_clock
+  - '0'
+- - simulation_clock
+  - '0'
+  - select_low_frequency
+  - '0'
+- - simulation_clock
+  - '0'
+  - before_after
+  - '0'
+- - select_low_frequency
+  - '0'
+  - before_after
+  - '1'
+metadata:
+  file_format: 1
+  grc_version: 3.10.12.0

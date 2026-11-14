@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.DS_Store
+Thumbs.db
+*.bak
+*.swp
+
+# Store personal hardware captures separately from the teaching references.
+hardware_runs/
+beacon_log*.csv

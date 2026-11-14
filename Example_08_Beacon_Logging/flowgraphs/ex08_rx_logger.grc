@@ -1,0 +1,512 @@
+options:
+  parameters:
+    title: Example 8 - Beacon receiver
+    author: Aya - SDR learning course
+    copyright: ''
+    description: ''
+    output_language: python
+    generate_options: qt_gui
+    gen_linking: dynamic
+    gen_cmake: 'On'
+    cmake_opt: ''
+    category: '[GRC Hier Blocks]'
+    run_options: prompt
+    placement: (0,0)
+    window_size: (1100,800)
+    sizing_mode: fixed
+    run: 'True'
+    max_nouts: '0'
+    realtime_scheduling: ''
+    qt_qss_theme: ''
+    thread_safe_setters: ''
+    catch_exceptions: 'True'
+    run_command: '{python} -u {filename}'
+    hier_block_src_path: '.:'
+    id: ex08_rx_logger
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 16
+    - 16
+    rotation: 0
+    state: enabled
+blocks:
+- name: samp_rate
+  id: variable
+  parameters:
+    value: '2400000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 240
+    - 16
+    rotation: 0
+    state: enabled
+- name: rf_center
+  id: variable
+  parameters:
+    value: '2450000000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 470
+    - 16
+    rotation: 0
+    state: enabled
+- name: rf_bw
+  id: variable
+  parameters:
+    value: '20000000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 700
+    - 16
+    rotation: 0
+    state: enabled
+- name: device_uri
+  id: variable
+  parameters:
+    value: '''ip:192.168.2.1'''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 930
+    - 16
+    rotation: 0
+    state: enabled
+- name: rx_gain_db
+  id: variable
+  parameters:
+    value: '20'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1160
+    - 16
+    rotation: 0
+    state: enabled
+- name: channel_offset
+  id: variable
+  parameters:
+    value: '100000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 240
+    - 98
+    rotation: 0
+    state: enabled
+- name: channel_rate
+  id: variable
+  parameters:
+    value: '48000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 470
+    - 98
+    rotation: 0
+    state: enabled
+- name: radio_rx
+  id: iio_pluto_source
+  parameters:
+    type: fc32
+    uri: device_uri
+    frequency: rf_center
+    samplerate: samp_rate
+    buffer_size: '32768'
+    quadrature: 'True'
+    rfdc: 'True'
+    bbdc: 'True'
+    gain1: '''manual'''
+    manual_gain1: rx_gain_db
+    len_tag_key: ''
+    filter_source: '''Off'''
+    filter: ''
+    fpass: '0'
+    fstop: '0'
+    bandwidth: rf_bw
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 80
+    - 360
+    rotation: 0
+    state: enabled
+- name: select_beacon
+  id: freq_xlating_fir_filter_xxx
+  parameters:
+    type: ccf
+    decim: '50'
+    taps: firdes.low_pass(1.0, samp_rate, 5000, 3000, window.WIN_HAMMING, 6.76)
+    center_freq: channel_offset
+    samp_rate: samp_rate
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 390
+    - 360
+    rotation: 0
+    state: enabled
+- name: selected_spectrum
+  id: qtgui_freq_sink_x
+  parameters:
+    type: complex
+    name: Selected beacon channel - frequency relative to selected center
+    fftsize: '4096'
+    freqhalf: 'False'
+    wintype: window.WIN_HANN
+    norm_window: 'False'
+    fc: '0'
+    bw: channel_rate
+    grid: 'True'
+    autoscale: 'False'
+    average: 'False'
+    ymin: '-120'
+    ymax: '10'
+    label: Digital spectral level
+    units: dB
+    nconnections: '1'
+    update_time: '0.15'
+    showports: 'False'
+    gui_hint: 0,0,1,1
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_level: '0.0'
+    tr_chan: '0'
+    tr_tag: '""'
+    ctrlpanel: 'False'
+    legend: 'True'
+    axislabels: 'True'
+    label1: Input
+    width1: '1'
+    color1: red
+    alpha1: '1.0'
+    label2: Filtered
+    width2: '1'
+    color2: blue
+    alpha2: '1.0'
+    label3: ''''''
+    width3: '1'
+    color3: '"green"'
+    alpha3: '1.0'
+    label4: ''''''
+    width4: '1'
+    color4: '"black"'
+    alpha4: '1.0'
+    label5: ''''''
+    width5: '1'
+    color5: '"cyan"'
+    alpha5: '1.0'
+    label6: ''''''
+    width6: '1'
+    color6: '"magenta"'
+    alpha6: '1.0'
+    label7: ''''''
+    width7: '1'
+    color7: '"yellow"'
+    alpha7: '1.0'
+    label8: ''''''
+    width8: '1'
+    color8: '"dark red"'
+    alpha8: '1.0'
+    label9: ''''''
+    width9: '1'
+    color9: '"dark green"'
+    alpha9: '1.0'
+    label10: ''''''
+    width10: '1'
+    color10: '"dark blue"'
+    alpha10: '1.0'
+    averaging: '1.0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 740
+    - 330
+    rotation: 0
+    state: enabled
+- name: instant_power
+  id: blocks_complex_to_mag_squared
+  parameters:
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 720
+    - 1000
+    rotation: 0
+    state: enabled
+- name: average_power
+  id: blocks_moving_average_xx
+  parameters:
+    type: float
+    length: '4800'
+    scale: 1.0/4800
+    max_iter: '4096'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 960
+    - 1000
+    rotation: 0
+    state: enabled
+- name: report_10_per_second
+  id: blocks_keep_one_in_n
+  parameters:
+    type: float
+    n: '4800'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1200
+    - 1000
+    rotation: 0
+    state: enabled
+- name: relative_power_db
+  id: blocks_nlog10_ff
+  parameters:
+    n: '10'
+    k: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1440
+    - 1000
+    rotation: 0
+    state: enabled
+- name: power_display
+  id: qtgui_number_sink
+  parameters:
+    name: Selected channel power - relative digital dB
+    type: float
+    autoscale: 'False'
+    avg: '0'
+    graph_type: qtgui.NUM_GRAPH_NONE
+    nconnections: '1'
+    min: '-120'
+    max: '0'
+    update_time: '0.10'
+    gui_hint: 1,0,1,1
+    label1: 10 log10(mean |z|^2)
+    unit1: dB re 1 digital unit squared
+    color1: ("black", "black")
+    factor1: '1'
+    label2: ''
+    unit2: ''
+    color2: ("black", "black")
+    factor2: '1'
+    label3: ''
+    unit3: ''
+    color3: ("black", "black")
+    factor3: '1'
+    label4: ''
+    unit4: ''
+    color4: ("black", "black")
+    factor4: '1'
+    label5: ''
+    unit5: ''
+    color5: ("black", "black")
+    factor5: '1'
+    label6: ''
+    unit6: ''
+    color6: ("black", "black")
+    factor6: '1'
+    label7: ''
+    unit7: ''
+    color7: ("black", "black")
+    factor7: '1'
+    label8: ''
+    unit8: ''
+    color8: ("black", "black")
+    factor8: '1'
+    label9: ''
+    unit9: ''
+    color9: ("black", "black")
+    factor9: '1'
+    label10: ''
+    unit10: ''
+    color10: ("black", "black")
+    factor10: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1680
+    - 1000
+    rotation: 0
+    state: enabled
+- name: run_label
+  id: variable
+  parameters:
+    value: '''tx_off'''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 700
+    - 98
+    rotation: 0
+    state: enabled
+- name: log_file
+  id: variable
+  parameters:
+    value: '''beacon_log.csv'''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 930
+    - 98
+    rotation: 0
+    state: enabled
+- name: measurement_logger
+  id: epy_block
+  parameters:
+    _source_code: "\"\"\"GNU Radio embedded measurement sink. No files are opened\
+      \ during GRC inspection.\"\"\"\nimport csv\nfrom datetime import datetime, timezone\n\
+      from pathlib import Path\nimport time\nimport uuid\nimport numpy as np\nfrom\
+      \ gnuradio import gr\n\n\nclass blk(gr.sync_block):\n    \"\"\"Log nonoverlapping\
+      \ channel-power windows with host processing timestamps.\n\n    The timestamps\
+      \ are NOT sample-synchronized radio timestamps. A run_label is\n    manually\
+      \ assigned metadata; it is not an identity decoded from the beacon.\n    Stop\
+      \ the graph before changing settings. Initial one second is discarded.\n   \
+      \ \"\"\"\n    def __init__(self, sample_rate=48000, window_samples=4800,\n \
+      \                output_file='beacon_log.csv', run_label='tx_off',\n       \
+      \          rf_center_hz=2450000000, channel_offset_hz=100000,\n            \
+      \     rx_gain_db=20):\n        gr.sync_block.__init__(self, name='Timestamped\
+      \ channel-power logger',\n                               in_sig=[np.complex64],\
+      \ out_sig=[])\n        self._fs = int(sample_rate)\n        self._window = int(window_samples)\n\
+      \        if self._fs <= 0 or self._window <= 0:\n            raise ValueError('Sample\
+      \ rate and window size must be positive')\n        self._filename = str(output_file)\n\
+      \        self._label = str(run_label)\n        self._rf = float(rf_center_hz)\n\
+      \        self._offset = float(channel_offset_hz)\n        self._gain = float(rx_gain_db)\n\
+      \        self._skip = self._fs\n        self._next_start = self._fs\n      \
+      \  self._pending = np.empty(0, dtype=np.complex64)\n        self._handle = None\n\
+      \        self._writer = None\n        self._seq = 0\n\n    def _open(self):\n\
+      \        target = Path(self._filename).expanduser().resolve()\n        target.parent.mkdir(parents=True,\
+      \ exist_ok=True)\n        while True:\n            try:\n                self._handle\
+      \ = target.open('x', newline='', encoding='utf-8')\n                break\n\
+      \            except FileExistsError:\n                stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S')\n\
+      \                target = target.with_name(target.stem + '_' + stamp + '_' +\
+      \ uuid.uuid4().hex[:6] + target.suffix)\n        fields = ['host_processed_utc','host_monotonic_s','sequence','run_label',\n\
+      \                  'sample_start','sample_end_exclusive','stream_start_s','window_s',\n\
+      \                  'sample_rate_sps','rf_center_hz','channel_offset_hz','rx_gain_db',\n\
+      \                  'gain_mode','channel_cutoff_hz','transition_width_hz',\n\
+      \                  'power_linear_digital','power_db_re_1','valid']\n       \
+      \ self._writer = csv.DictWriter(self._handle, fieldnames=fields)\n        self._writer.writeheader()\n\
+      \        print('Power log:', target, flush=True)\n\n    def work(self, input_items,\
+      \ output_items):\n        original = input_items[0]\n        data = original\n\
+      \        if self._skip:\n            count = min(self._skip, len(data))\n  \
+      \          data = data[count:]\n            self._skip -= count\n        if\
+      \ len(data):\n            if self._handle is None:\n                self._open()\n\
+      \            self._pending = np.concatenate((self._pending, data))\n       \
+      \     n_complete = len(self._pending) // self._window\n            for i in\
+      \ range(n_complete):\n                z = self._pending[i*self._window:(i+1)*self._window].astype(np.complex128)\n\
+      \                valid = bool(np.all(np.isfinite(z)))\n                p = float(np.mean(np.abs(z)**2))\
+      \ if valid else float('nan')\n                db = float(10*np.log10(p)) if\
+      \ valid and p > 0 else None\n                self._writer.writerow(dict(\n \
+      \                   host_processed_utc=datetime.now(timezone.utc).isoformat(timespec='milliseconds'),\n\
+      \                    host_monotonic_s=f'{time.monotonic():.6f}', sequence=self._seq,\n\
+      \                    run_label=self._label, sample_start=self._next_start,\n\
+      \                    sample_end_exclusive=self._next_start+self._window,\n \
+      \                   stream_start_s=self._next_start/self._fs, window_s=self._window/self._fs,\n\
+      \                    sample_rate_sps=self._fs, rf_center_hz=self._rf,\n    \
+      \                channel_offset_hz=self._offset, rx_gain_db=self._gain,\n  \
+      \                  gain_mode='manual',channel_cutoff_hz=5000, transition_width_hz=3000,\n\
+      \                    power_linear_digital=p if valid else '',\n            \
+      \        power_db_re_1=db if db is not None else '',valid=int(valid)))\n   \
+      \             self._seq += 1\n                self._next_start += self._window\n\
+      \            self._pending = self._pending[n_complete*self._window:].copy()\n\
+      \            self._handle.flush()\n        return len(original)\n\n    def stop(self):\n\
+      \        if self._handle is not None:\n            self._handle.flush()\n  \
+      \          self._handle.close()\n            self._handle = None\n        return\
+      \ True\n"
+    sample_rate: channel_rate
+    window_samples: '4800'
+    output_file: log_file
+    run_label: run_label
+    rf_center_hz: rf_center
+    channel_offset_hz: channel_offset
+    rx_gain_db: rx_gain_db
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 740
+    - 650
+    rotation: 0
+    state: enabled
+connections:
+- - radio_rx
+  - '0'
+  - select_beacon
+  - '0'
+- - select_beacon
+  - '0'
+  - selected_spectrum
+  - '0'
+- - select_beacon
+  - '0'
+  - instant_power
+  - '0'
+- - instant_power
+  - '0'
+  - average_power
+  - '0'
+- - average_power
+  - '0'
+  - report_10_per_second
+  - '0'
+- - report_10_per_second
+  - '0'
+  - relative_power_db
+  - '0'
+- - relative_power_db
+  - '0'
+  - power_display
+  - '0'
+- - select_beacon
+  - '0'
+  - measurement_logger
+  - '0'
+metadata:
+  file_format: 1
+  grc_version: 3.10.12.0
