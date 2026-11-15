@@ -1,0 +1,16 @@
+filter taps: 1157   sum(h^2) = 0.00979   predicted noise power in channel = sigma^2*sum(h^2) = 3.915e-06  (-54.07 dB)
+vmcircbuf_prefs::get :info: /root/.config/gnuradio/prefs/vmcircbuf_default_factory failed to open: bad true, fail true, eof true
+[1] TX OFF baseline (noise only): reading -54.08 dB, std 0.029 dB, linear 3.904e-06
+[2] TX power steps (tone at 100.3 kHz, filter centre 100 kHz => 300 Hz offset): 30 dB -> 40 dB -> 30 dB attenuation
+    target SNR | amp@30 | read@30 | read@40 | read@30 again | drop 30->40 | predicted drop | restore error
+        40 dB | 0.1979 |  -14.06 |  -24.06 |        -14.06 |    -10.00 dB |     -10.00 dB | +0.00 dB
+        20 dB | 0.0198 |  -34.02 |  -43.66 |        -34.02 |     -9.64 dB |      -9.63 dB | +0.00 dB
+        10 dB | 0.0063 |  -43.66 |  -51.08 |        -43.65 |     -7.42 dB |      -7.40 dB | +0.01 dB
+         0 dB | 0.0020 |  -51.08 |  -53.68 |        -51.07 |     -2.60 dB |      -2.60 dB | +0.01 dB
+[3] Reading versus filter centring error (SNR 40 dB signal, tone at 100.3 kHz):
+    filter centre   100.0 kHz (tone offset from centre   +0.3 kHz): reading  -14.06 dB
+    filter centre   103.0 kHz (tone offset from centre   -2.7 kHz): reading  -14.04 dB
+    filter centre   104.5 kHz (tone offset from centre   -4.2 kHz): reading  -14.83 dB
+    filter centre   107.0 kHz (tone offset from centre   -6.7 kHz): reading  -53.84 dB
+    filter centre   112.0 kHz (tone offset from centre  -11.7 kHz): reading  -54.05 dB
+[4] Definition check: tone amplitude a gives P = a^2 -> for a = 0.05: -26.02 dB

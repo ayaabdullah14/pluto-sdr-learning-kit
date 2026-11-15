@@ -1,0 +1,4 @@
+true power = 1.0000  -> 0.00 dB
+mean of linear power, then dB : -0.001 dB   (correct)
+dB of each sample, then mean  : -2.512 dB   (biased low; theory -2.507 dB for noise)
+P = mean(I^2+Q^2) for a complex tone of amplitude 0.1: 0.01000 (theory 0.01000 = -20 dB)

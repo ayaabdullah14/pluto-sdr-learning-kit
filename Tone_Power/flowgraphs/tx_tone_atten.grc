@@ -1,0 +1,102 @@
+options:
+  parameters: {author: '', catch_exceptions: 'True', category: '[GRC Hier Blocks]',
+    comment: '', copyright: '', description: Continuous complex tone -> PlutoSDR Sink.
+      The only control is TX attenuation., generate_options: qt_gui, hier_block_src_path: '.:',
+    id: tx_tone_atten, max_nouts: '0', output_language: python, placement: '(0,0)',
+    qt_qss_theme: '', realtime_scheduling: '', run: 'True', run_command: '{python}
+      -u {filename}', run_options: prompt, sizing_mode: fixed, thread_safe_setters: '',
+    title: Tone transmitter with attenuation control (Laptop 1), window_size: '(1100,800)'}
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 8]
+    rotation: 0
+    state: enabled
+blocks:
+- name: pluto_uri
+  id: variable
+  parameters: {value: '"ip:192.168.2.1"', comment: 'ENTER YOUR URI HERE. Find it with:
+      iio_info -s  (copy the text inside [ ], e.g. ip:192.168.2.1 or usb:1.5.5). Each
+      laptop has its OWN Pluto.'}
+  states:
+    coordinate: [8, 100]
+    rotation: 0
+    state: enabled
+- name: samp_rate
+  id: variable
+  parameters: {value: '960000', comment: Pluto sample rate (S/s). Replace with your
+      known-working value if different.}
+  states:
+    coordinate: [8, 170]
+    rotation: 0
+    state: enabled
+- name: lo_freq
+  id: variable
+  parameters: {value: '2450000000', comment: Radio centre frequency (Hz). Must be
+      IDENTICAL on TX and RX. Use a frequency you are permitted to use.}
+  states:
+    coordinate: [8, 240]
+    rotation: 0
+    state: enabled
+- name: rf_bw
+  id: variable
+  parameters: {value: '1000000', comment: Pluto analog RF bandwidth (Hz).}
+  states:
+    coordinate: [8, 310]
+    rotation: 0
+    state: enabled
+- name: tone_offset
+  id: variable
+  parameters: {value: '100000', comment: 'Tone offset from lo_freq (Hz): real RF tone
+      = lo_freq + tone_offset. Away from the DC spike at 0 Hz.'}
+  states:
+    coordinate: [8, 380]
+    rotation: 0
+    state: enabled
+- name: tone_amp
+  id: variable
+  parameters: {value: '0.5', comment: 'Digital amplitude of the complex tone (|z|
+      = 0.5, below 1: no clipping).'}
+  states:
+    coordinate: [8, 450]
+    rotation: 0
+    state: enabled
+- name: tx_atten
+  id: variable_qtgui_range
+  parameters: {label: 'TX attenuation (dB): bigger = WEAKER', value: '30', start: '0',
+    stop: '70', step: '1', widget: counter_slider, rangeType: float, gui_hint: '0,0,1,1'}
+  states:
+    coordinate: [8, 520]
+    rotation: 0
+    state: enabled
+- name: safe
+  id: note
+  parameters: {note: 'SAFETY: antenna connected, antennas >= 1 m apart. Never start
+      at 0 dB. Attenuation REDUCES power: +10 dB attenuation = 10 dB weaker.'}
+  states:
+    coordinate: [200, 60]
+    rotation: 0
+    state: enabled
+- name: tone
+  id: analog_sig_source_x
+  parameters: {type: complex, samp_rate: samp_rate, waveform: analog.GR_COS_WAVE,
+    freq: tone_offset, amp: tone_amp, offset: '0', phase: '0', comment: 'KNOWN SIGNAL:
+      complex tone exp(j*2*pi*tone_offset*t), amplitude tone_amp.'}
+  states:
+    coordinate: [300, 200]
+    rotation: 0
+    state: enabled
+- name: pluto_tx
+  id: iio_pluto_sink
+  parameters: {type: fc32, uri: pluto_uri, frequency: int(lo_freq), samplerate: int(samp_rate),
+    bandwidth: int(rf_bw), buffer_size: '32768', cyclic: 'False', attenuation1: tx_atten,
+    filter_source: '''Auto''', comment: 'PlutoSDR Sink: attenuation1 = tx_atten. The
+      Pluto sets the pace, so no Throttle.'}
+  states:
+    coordinate: [640, 200]
+    rotation: 0
+    state: enabled
+connections:
+- [tone, '0', pluto_tx, '0']
+metadata: {file_format: 1, grc_version: 3.10.9.2}
