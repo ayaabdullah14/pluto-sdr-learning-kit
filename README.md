@@ -1,54 +1,39 @@
 # Pluto SDR Learning Kit
 
-A progressive, practical SDR course preparing the radio-measurement foundation for an indoor robot-tracking graduation project.
+GNU Radio AM learning files for two ADALM-PLUTO devices, organized from the supplied files.
 
-**Target environment:** GNU Radio **3.10.12.0**, Python **3.12.9**, Windows 11 Pro, two ADALM-PLUTO devices and two laptops for the hardware link.
+| Experiment | Files and guide |
+|---|---|
+| AM modulation and demodulation with a sinusoidal message | [AM tone guide](AM_Mod_Demod/pluto/README.md) · [TX](AM_Mod_Demod/pluto/am_tx_pluto.grc) · [RX](AM_Mod_Demod/pluto/am_rx_pluto.grc) |
+| AM audio transmission and recovery | [Audio guide](AM_Audio/README.md) · [Report](AM_Audio/REPORT.md) · [TX](AM_Audio/flowgraphs/am_audio_tx_pluto.grc) · [RX](AM_Audio/flowgraphs/am_audio_rx_pluto.grc) |
 
-**Start in Arabic:** [ابدئي من هنا](START_AR.md) · **Full roadmap:** [START_HERE.md](START_HERE.md)
+## Start here
 
-## What is included?
+Open the `.grc` files in GNU Radio Companion (target environment: GNU Radio 3.10.12.0 / Python 3.12.9). Generate and run the Python code from Companion after setting the correct device URI on each laptop. The supplied audio RX Python file is also included in `AM_Audio/flowgraphs/`.
 
-- Eight progressive examples with **16 editable GNU Radio `.grc` flowgraphs**.
-- One or two purposeful GUI panels per flowgraph.
-- An English `README.md` for operation, checks and troubleshooting in every example.
-- An engineering `REPORT.md` with design rationale, equations, predictions and project connections in every example.
-- Short Arabic quick starts, circuit-layout guides and blank measurement worksheets.
-- A known audio test clip and Python scripts for numerical references and measurement logging.
+The two experiments use different sample-rate settings. Follow the guide belonging to the flowgraphs you open.
 
-## Learning sequence
+## Generate the audio file
 
-| Example | Main skill | Start here |
-| --- | --- | --- |
-| 1. Signal basics | Read time/frequency plots and verify a known signal | [Arabic quick start](Example_01_Signal_Basics/QUICK_START_AR.md) |
-| 2. Receiver baseline | Observe noise, existing signals and possible artifacts with TX off | [Arabic quick start](Example_02_RX_Baseline/QUICK_START_AR.md) |
-| 3. Known-tone link | Prove reception using TX on/off and deliberate frequency changes | [Arabic quick start](Example_03_Known_Tone/QUICK_START_AR.md) |
-| 4. AM tone | Understand the envelope/sidebands, then recover a message | [Arabic quick start](Example_04_AM_Tone/QUICK_START_AR.md) |
-| 5. AM audio | Trace sample rates and recover a known audio sequence | [Arabic quick start](Example_05_AM_Audio/QUICK_START_AR.md) |
-| 6. Filtering | Select the desired signal and reject an unwanted band | [Arabic quick start](Example_06_Filtering/QUICK_START_AR.md) |
-| 7. Power experiments | Compare relative digital power under controlled conditions | [Arabic quick start](Example_07_Power_Experiments/QUICK_START_AR.md) |
-| 8. Beacon logging | Save windowed channel-power measurements with metadata | [Arabic quick start](Example_08_Beacon_Logging/QUICK_START_AR.md) |
+The WAV file was not supplied. From the `AM_Audio` directory, with NumPy installed, run:
 
-## First run — no radio needed
+```sh
+mkdir assets
+python scripts/make_test_audio.py
+```
 
-1. Download the repository as a ZIP and extract it, or clone it.
-2. Open GNU Radio Companion and choose **File → Open**.
-3. Open [ex01_signal_basics.grc](Example_01_Signal_Basics/flowgraphs/ex01_signal_basics.grc).
-4. Generate and execute the flowgraph. Follow its [README](Example_01_Signal_Basics/README.md).
+This creates `assets/test_audio_48k.wav`. In the audio TX flowgraph, set `wav_path` to this file's absolute path, or copy the WAV into `flowgraphs/` and select it there. For analysis, install SciPy too (Matplotlib is optional), then run from `AM_Audio`:
 
-Examples **1**, **4A** and **6A** are simulations that can be used without Pluto hardware. Before radio experiments, read [COMPATIBILITY.md](COMPATIBILITY.md) and the hardware instructions in the relevant README. The native GNU Radio IIO Pluto blocks are required for the supplied hardware circuits.
+```sh
+python scripts/compare_audio.py assets/test_audio_48k.wav recovered_audio.f32
+```
 
-## A clear AM reference
+Set the RX recording path to the intended file location before recording.
 
-The red waveform and blue positive envelope below are an **independent numerical simulation**, not a GNU Radio screenshot or a hardware capture.
+## Included material and validation
 
-![AM waveform, envelope and sidebands](Example_04_AM_Tone/results/reference_simulation.png)
+All ten supplied files are preserved without content changes; download suffixes were removed from the tone filenames and the two README files were placed with their experiments. The original guides refer to some generated Python files, reference images, and `results/` logs that were not supplied. Generate the tone Python files in Companion; the other referenced artifacts are not included in this upload. Statements about earlier calculations or tests in the supplied guides describe their original preparation, not a new hardware test.
 
-## Validation status
+For this upload, the four `.grc` files were parsed as YAML and the three Python scripts were checked for syntax. GNU Radio execution, radio communication, and audio quality have not been verified in this upload.
 
-The files passed exact-version GRC structure/code-generation checks using runtime stand-ins, independent numerical model checks and isolated Python logger tests. **Actual GNU Radio DSP/GUI execution and Pluto hardware testing have not been performed in the authoring environment.** See [VALIDATION.md](VALIDATION.md) for the exact methods and limits.
-
-Power measurements are relative digital quantities, not calibrated dBm. Host processing timestamps do not establish synchronized RF sample timing. Use the RF setup and frequency approved by the lab; the numeric LO default is a design reference, not authorization to transmit over the air.
-
-## Project handoff
-
-This course prepares the SDR link, signal interpretation, channel selection and measurement logging. Multi-anchor localization, odometry integration, timing/association design, EKF fusion and camera ground truth remain later project stages. Use [FINAL_ASSESSMENT.md](FINAL_ASSESSMENT.md) to check SDR readiness.
+The previous repository contents were replaced in the current revision and remain available in Git history.

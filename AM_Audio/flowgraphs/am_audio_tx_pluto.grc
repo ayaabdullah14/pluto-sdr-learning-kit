@@ -1,0 +1,250 @@
+options:
+  parameters: {author: '', catch_exceptions: 'True', category: '[GRC Hier Blocks]',
+    comment: '', copyright: '', description: Wav audio -> 4 kHz low-pass -> m scaling
+      -> x20 resampler -> envelope -> carrier at +100 kHz -> PlutoSDR Sink, generate_options: qt_gui,
+    hier_block_src_path: '.:', id: am_audio_tx_pluto, max_nouts: '0', output_language: python,
+    placement: '(0,0)', qt_qss_theme: '', realtime_scheduling: '', run: 'True', run_command: '{python}
+      -u {filename}', run_options: prompt, sizing_mode: fixed, thread_safe_setters: '',
+    title: AM audio transmitter for ADALM-PLUTO (Laptop 1), window_size: '(1100,800)'}
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 8]
+    rotation: 0
+    state: enabled
+blocks:
+- name: pluto_uri
+  id: variable
+  parameters: {value: '"ip:192.168.2.1"', comment: Pluto address (same on both laptops;
+      each laptop has its own Pluto).}
+  states:
+    coordinate: [8, 100]
+    rotation: 0
+    state: enabled
+- name: samp_rate
+  id: variable
+  parameters: {value: '960000', comment: Pluto rate = 48000 x 20. Integer ratios make
+      the audio rate conversions exact. Same on TX and RX.}
+  states:
+    coordinate: [8, 170]
+    rotation: 0
+    state: enabled
+- name: lo_freq
+  id: variable
+  parameters: {value: '2450000000', comment: Radio centre frequency (Hz). MUST be
+      the same on TX and RX. Use a frequency you are permitted to use; the wired test
+      does not radiate.}
+  states:
+    coordinate: [8, 240]
+    rotation: 0
+    state: enabled
+- name: rf_bw
+  id: variable
+  parameters: {value: '1000000', comment: Pluto analog RF bandwidth (Hz).}
+  states:
+    coordinate: [8, 310]
+    rotation: 0
+    state: enabled
+- name: audio_rate
+  id: variable
+  parameters: {value: '48000', comment: Audio sample rate (S/s).}
+  states:
+    coordinate: [8, 380]
+    rotation: 0
+    state: enabled
+- name: fc
+  id: variable
+  parameters: {value: '100000', comment: Carrier offset from lo_freq (Hz). Away from
+      the DC spike.}
+  states:
+    coordinate: [8, 450]
+    rotation: 0
+    state: enabled
+- name: carrier_amp
+  id: variable
+  parameters: {value: '0.4', comment: Peak = carrier_amp*(1 + m*max|audio|) = 0.4*(1+0.9)
+      = 0.76 at m = 0.9. Below 1.}
+  states:
+    coordinate: [8, 520]
+    rotation: 0
+    state: enabled
+- name: wav_path
+  id: variable
+  parameters: {value: '"test_audio_48k.wav"', comment: 'Path to the wav (mono, 48000
+      S/s). Use the full path if the file is not next to the .grc.'}
+  states:
+    coordinate: [8, 590]
+    rotation: 0
+    state: enabled
+- name: m
+  id: variable_qtgui_range
+  parameters: {label: Modulation depth m (audio peak is 0.9), value: '0.6', start: '0',
+    stop: '1', step: '0.05', widget: counter_slider, rangeType: float, gui_hint: '0,0,1,1'}
+  states:
+    coordinate: [8, 660]
+    rotation: 0
+    state: enabled
+- name: tx_atten
+  id: variable_qtgui_range
+  parameters: {label: TX attenuation (dB) START HIGH, value: '40', start: '0', stop: '60',
+    step: '1', widget: counter_slider, rangeType: float, gui_hint: '0,1,1,1'}
+  states:
+    coordinate: [8, 740]
+    rotation: 0
+    state: enabled
+- name: tabs
+  id: qtgui_tab_widget
+  parameters: {num_tabs: '3', gui_hint: '1,0,1,2', orient: Qt.QTabWidget.North, label0: 1
+      Audio in (time), label1: 2 Audio spectrum, label2: 3 RF spectrum (what is radiated),
+    comment: 'Tab container: each display below is placed in one tab (gui_hint tabs@N).'}
+  states:
+    coordinate: [400, 12]
+    rotation: 0
+    state: enabled
+- name: safe
+  id: note
+  parameters: {note: 'SAFETY: antenna or cable+attenuators on TX before running. Start
+      attenuation 40 dB. For a microphone instead of the wav: disable Wav File Source,
+      enable Audio Source, and use headphones.'}
+  states:
+    coordinate: [200, 60]
+    rotation: 0
+    state: enabled
+- name: wav
+  id: blocks_wavfile_source
+  parameters: {file: wav_path, nchan: '1', repeat: 'True', comment: 'AUDIO MESSAGE:
+      float samples in [-1, 1] at 48 kS/s, loops forever.'}
+  states:
+    coordinate: [200, 160]
+    rotation: 0
+    state: enabled
+- name: mic
+  id: audio_source
+  parameters: {samp_rate: audio_rate, device_name: '', ok_to_block: 'True', num_outputs: '1',
+    comment: OPTIONAL microphone (disabled). Enable it and disable Wav File Source
+      to speak.}
+  states:
+    coordinate: [200, 310]
+    rotation: 0
+    state: disabled
+- name: lpf
+  id: low_pass_filter
+  parameters: {type: fir_filter_fff, decim: '1', gain: '1', samp_rate: audio_rate,
+    cutoff_freq: '4000', width: '1000', win: window.WIN_HAMMING, beta: '6.76', comment: LIMITS
+      AUDIO to 4 kHz so the AM signal is 8 kHz wide (2 x 4 kHz).}
+  states:
+    coordinate: [460, 160]
+    rotation: 0
+    state: enabled
+- name: mscale
+  id: blocks_multiply_const_vxx
+  parameters: {type: float, const: m, vlen: '1', comment: 'SETS MODULATION DEPTH:
+      m * audio.'}
+  states:
+    coordinate: [700, 160]
+    rotation: 0
+    state: enabled
+- name: up
+  id: rational_resampler_xxx
+  parameters: {type: fff, interp: '20', decim: '1', taps: '[]', fbw: '0', comment: SAMPLE-RATE
+      CONVERSION 48 kS/s -> 960 kS/s (x20). Auto anti-image filter. The audio now
+      matches the Pluto rate.}
+  states:
+    coordinate: [930, 160]
+    rotation: 0
+    state: enabled
+- name: one
+  id: blocks_add_const_vxx
+  parameters: {type: float, const: '1', vlen: '1', comment: ENVELOPE 1 + m*audio (the
+      1 is the carrier).}
+  states:
+    coordinate: [1160, 160]
+    rotation: 0
+    state: enabled
+- name: scale
+  id: blocks_multiply_const_vxx
+  parameters: {type: float, const: carrier_amp, vlen: '1', comment: Sets overall amplitude
+      (no clipping).}
+  states:
+    coordinate: [1380, 160]
+    rotation: 0
+    state: enabled
+- name: f2c
+  id: blocks_float_to_complex
+  parameters: {vlen: '1', comment: Float -> complex.}
+  states:
+    coordinate: [1600, 160]
+    rotation: 0
+    state: enabled
+- name: carrier
+  id: analog_sig_source_x
+  parameters: {type: complex, samp_rate: samp_rate, waveform: analog.GR_COS_WAVE,
+    freq: fc, amp: '1', offset: '0', phase: '0', comment: CARRIER exp(j*2*pi*fc*t)
+      at +100 kHz.}
+  states:
+    coordinate: [1600, 290]
+    rotation: 0
+    state: enabled
+- name: mod
+  id: blocks_multiply_xx
+  parameters: {type: complex, num_inputs: '2', vlen: '1', comment: MODULATOR.}
+  states:
+    coordinate: [1820, 160]
+    rotation: 0
+    state: enabled
+- name: pluto_tx
+  id: iio_pluto_sink
+  parameters: {uri: pluto_uri, frequency: int(lo_freq), samplerate: int(samp_rate),
+    bandwidth: int(rf_bw), buffer_size: '32768', cyclic: 'False', attenuation1: tx_atten,
+    filter_source: Auto, comment: 'PlutoSDR Sink: turns the complex stream into a
+      radio signal at lo_freq. Attenuation is REDUCTION in dB (bigger = weaker). The
+      Pluto sets the speed, so no Throttle.'}
+  states:
+    coordinate: [2040, 160]
+    rotation: 0
+    state: enabled
+- name: t_aud
+  id: qtgui_time_sink_x
+  parameters: {type: float, srate: audio_rate, nconnections: '1', name: '"Audio after
+      filter and scaling (= m * audio) vs time (s)"', size: '4096', ymin: '-1', ymax: '1',
+    gui_hint: 'tabs@0:0,0,1,1', tr_mode: qtgui.TRIG_MODE_FREE, autoscale: 'False',
+    grid: 'True', axislabels: 'True', ctrlpanel: 'False'}
+  states:
+    coordinate: [700, 420]
+    rotation: 0
+    state: enabled
+- name: f_aud
+  id: qtgui_freq_sink_x
+  parameters: {type: float, bw: audio_rate, fc: '0', fftsize: '4096', name: '"Audio
+      spectrum (Hz): content below 4 kHz"', nconnections: '1', gui_hint: 'tabs@1:0,0,1,1',
+    wintype: window.WIN_BLACKMAN_hARRIS, average: '0.2', ymin: '-120', ymax: '0',
+    grid: 'True', axislabels: 'True', ctrlpanel: 'False'}
+  states:
+    coordinate: [930, 420]
+    rotation: 0
+    state: enabled
+- name: f_rf
+  id: qtgui_freq_sink_x
+  parameters: {type: complex, bw: samp_rate, fc: '0', fftsize: '8192', name: '"Transmitted
+      spectrum (baseband Hz): carrier at +100 kHz, 8 kHz wide"', nconnections: '1',
+    gui_hint: 'tabs@2:0,0,1,1', wintype: window.WIN_BLACKMAN_hARRIS, average: '0.2',
+    ymin: '-120', ymax: '0', grid: 'True', axislabels: 'True', ctrlpanel: 'False'}
+  states:
+    coordinate: [1820, 420]
+    rotation: 0
+    state: enabled
+connections:
+- [wav, '0', lpf, '0']
+- [lpf, '0', mscale, '0']
+- [mscale, '0', up, '0']
+- [mscale, '0', t_aud, '0']
+- [mscale, '0', f_aud, '0']
+- [up, '0', one, '0']
+- [one, '0', scale, '0']
+- [scale, '0', f2c, '0']
+- [f2c, '0', mod, '0']
+- [carrier, '0', mod, '1']
+- [mod, '0', pluto_tx, '0']
+- [mod, '0', f_rf, '0']
+metadata: {file_format: 1, grc_version: 3.10.9.2}

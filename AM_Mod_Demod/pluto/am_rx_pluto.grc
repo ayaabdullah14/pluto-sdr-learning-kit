@@ -1,0 +1,758 @@
+options:
+  parameters:
+    title: AM RX - recovered message first
+    author: Aya
+    copyright: ''
+    description: 'AM RX v2: fixed manual gain, 48 kS/s channel, envelope detection
+      and 12 kS/s recovered message.'
+    output_language: python
+    generate_options: qt_gui
+    gen_linking: dynamic
+    gen_cmake: 'On'
+    cmake_opt: ''
+    category: '[GRC Hier Blocks]'
+    run_options: prompt
+    placement: (0,0)
+    window_size: (1200,800)
+    sizing_mode: fixed
+    run: 'True'
+    max_nouts: '0'
+    realtime_scheduling: ''
+    qt_qss_theme: ''
+    thread_safe_setters: ''
+    catch_exceptions: 'True'
+    run_command: '{python} -u {filename}'
+    hier_block_src_path: '.:'
+    id: am_rx_pluto_v2
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 16
+    - 16
+    rotation: 0
+    state: enabled
+blocks:
+- name: samp_rate
+  id: variable
+  parameters:
+    value: '2400000'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 16
+    - 96
+    rotation: 0
+    state: enabled
+- name: lo_freq
+  id: variable
+  parameters:
+    value: '2450000000'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 208
+    - 96
+    rotation: 0
+    state: enabled
+- name: pluto_uri
+  id: variable
+  parameters:
+    value: ''''''
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 416
+    - 96
+    rotation: 0
+    state: enabled
+- name: channel_rate
+  id: variable
+  parameters:
+    value: samp_rate // 50
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 624
+    - 96
+    rotation: 0
+    state: enabled
+- name: message_rate
+  id: variable
+  parameters:
+    value: channel_rate // 4
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 880
+    - 96
+    rotation: 0
+    state: enabled
+- name: rx_gain
+  id: variable_qtgui_range
+  parameters:
+    label: Manual RX gain (dB)
+    rangeType: float
+    value: '30'
+    start: '0'
+    stop: '60'
+    step: '1'
+    widget: counter_slider
+    orient: QtCore.Qt.Horizontal
+    min_len: '220'
+    gui_hint: 0,0,1,1
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 16
+    - 200
+    rotation: 0
+    state: enabled
+- name: carrier_position
+  id: variable_qtgui_range
+  parameters:
+    label: Carrier position / offset (Hz)
+    rangeType: float
+    value: '200000'
+    start: '100000'
+    stop: '300000'
+    step: '500'
+    widget: counter_slider
+    orient: QtCore.Qt.Horizontal
+    min_len: '220'
+    gui_hint: 0,1,1,2
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 304
+    - 200
+    rotation: 0
+    state: enabled
+- name: tabs
+  id: qtgui_tab_widget
+  parameters:
+    num_tabs: '3'
+    label0: 1 Recovered message
+    label1: 2 AM channel + envelope
+    label2: 3 Find carrier
+    label3: Tab 3
+    label4: Tab 4
+    label5: Tab 5
+    label6: Tab 6
+    label7: Tab 7
+    label8: Tab 8
+    label9: Tab 9
+    label10: Tab 10
+    label11: Tab 11
+    label12: Tab 12
+    label13: Tab 13
+    label14: Tab 14
+    label15: Tab 15
+    label16: Tab 16
+    label17: Tab 17
+    label18: Tab 18
+    label19: Tab 19
+    gui_hint: 1,0,1,3
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 704
+    - 192
+    rotation: 0
+    state: enabled
+- name: pluto_rx
+  id: iio_pluto_source
+  parameters:
+    type: fc32
+    uri: pluto_uri
+    frequency: int(lo_freq)
+    samplerate: int(samp_rate)
+    buffer_size: '32768'
+    quadrature: 'True'
+    rfdc: 'True'
+    bbdc: 'True'
+    gain1: '''manual'''
+    manual_gain1: rx_gain
+    len_tag_key: ''
+    filter_source: '''Auto'''
+    filter: ''
+    fpass: '0'
+    fstop: '0'
+    bandwidth: '2000000'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 16
+    - 384
+    rotation: 0
+    state: enabled
+- name: select_channel
+  id: freq_xlating_fir_filter_xxx
+  parameters:
+    type: ccf
+    decim: '50'
+    taps: firdes.low_pass(1.0, samp_rate, 15000, 5000, window.WIN_HAMMING)
+    center_freq: carrier_position
+    samp_rate: samp_rate
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 336
+    - 400
+    rotation: 0
+    state: enabled
+- name: envelope_detector
+  id: blocks_complex_to_mag
+  parameters:
+    vlen: '1'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 688
+    - 400
+    rotation: 0
+    state: enabled
+- name: remove_dc
+  id: dc_blocker_xx
+  parameters:
+    type: ff
+    length: '512'
+    long_form: 'True'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 912
+    - 400
+    rotation: 0
+    state: enabled
+- name: message_filter
+  id: low_pass_filter
+  parameters:
+    type: fir_filter_fff
+    decim: '4'
+    interp: '1'
+    gain: '1.0'
+    samp_rate: channel_rate
+    cutoff_freq: '4000'
+    width: '1000'
+    win: window.WIN_HAMMING
+    beta: '6.76'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1120
+    - 384
+    rotation: 0
+    state: enabled
+- name: recovered_time
+  id: qtgui_time_sink_x
+  parameters:
+    type: float
+    name: Recovered message (10 ms)
+    ylabel: Amplitude
+    yunit: a.u.
+    size: '120'
+    srate: message_rate
+    grid: 'True'
+    autoscale: 'True'
+    ymin: '-1'
+    ymax: '1'
+    nconnections: '1'
+    update_time: '0.10'
+    entags: 'False'
+    gui_hint: tabs@0:0,0,1,1
+    tr_mode: qtgui.TRIG_MODE_AUTO
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_level: '0'
+    tr_delay: '0'
+    tr_chan: '0'
+    tr_tag: '""'
+    ctrlpanel: 'False'
+    legend: 'True'
+    axislabels: 'True'
+    stemplot: 'False'
+    label1: Signal
+    width1: '1'
+    color1: blue
+    style1: '1'
+    marker1: '-1'
+    alpha1: '1.0'
+    label2: Signal 2
+    width2: '1'
+    color2: red
+    style2: '1'
+    marker2: '-1'
+    alpha2: '1.0'
+    label3: Signal 3
+    width3: '1'
+    color3: green
+    style3: '1'
+    marker3: '-1'
+    alpha3: '1.0'
+    label4: Signal 4
+    width4: '1'
+    color4: black
+    style4: '1'
+    marker4: '-1'
+    alpha4: '1.0'
+    label5: Signal 5
+    width5: '1'
+    color5: cyan
+    style5: '1'
+    marker5: '-1'
+    alpha5: '1.0'
+    label6: Signal 6
+    width6: '1'
+    color6: magenta
+    style6: '1'
+    marker6: '-1'
+    alpha6: '1.0'
+    label7: Signal 7
+    width7: '1'
+    color7: yellow
+    style7: '1'
+    marker7: '-1'
+    alpha7: '1.0'
+    label8: Signal 8
+    width8: '1'
+    color8: dark red
+    style8: '1'
+    marker8: '-1'
+    alpha8: '1.0'
+    label9: Signal 9
+    width9: '1'
+    color9: dark green
+    style9: '1'
+    marker9: '-1'
+    alpha9: '1.0'
+    label10: Signal 10
+    width10: '1'
+    color10: dark blue
+    style10: '1'
+    marker10: '-1'
+    alpha10: '1.0'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1120
+    - 704
+    rotation: 0
+    state: enabled
+- name: recovered_spectrum
+  id: qtgui_freq_sink_x
+  parameters:
+    type: float
+    name: Message spectrum (positive frequencies)
+    fftsize: '4096'
+    freqhalf: 'False'
+    wintype: window.WIN_BLACKMAN_hARRIS
+    norm_window: 'False'
+    fc: '0'
+    bw: message_rate
+    grid: 'True'
+    autoscale: 'False'
+    average: '0.2'
+    ymin: '-140'
+    ymax: '10'
+    label: Relative level
+    units: dB
+    nconnections: '1'
+    update_time: '0.10'
+    showports: 'False'
+    gui_hint: tabs@0:0,1,1,1
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_level: '0.0'
+    tr_chan: '0'
+    tr_tag: '""'
+    ctrlpanel: 'False'
+    legend: 'True'
+    axislabels: 'True'
+    label1: ''
+    width1: '1'
+    color1: '"blue"'
+    alpha1: '1.0'
+    label2: ''''''
+    width2: '1'
+    color2: '"red"'
+    alpha2: '1.0'
+    label3: ''''''
+    width3: '1'
+    color3: '"green"'
+    alpha3: '1.0'
+    label4: ''''''
+    width4: '1'
+    color4: '"black"'
+    alpha4: '1.0'
+    label5: ''''''
+    width5: '1'
+    color5: '"cyan"'
+    alpha5: '1.0'
+    label6: ''''''
+    width6: '1'
+    color6: '"magenta"'
+    alpha6: '1.0'
+    label7: ''''''
+    width7: '1'
+    color7: '"yellow"'
+    alpha7: '1.0'
+    label8: ''''''
+    width8: '1'
+    color8: '"dark red"'
+    alpha8: '1.0'
+    label9: ''''''
+    width9: '1'
+    color9: '"dark green"'
+    alpha9: '1.0'
+    label10: ''''''
+    width10: '1'
+    color10: '"dark blue"'
+    alpha10: '1.0'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1344
+    - 864
+    rotation: 0
+    state: enabled
+- name: channel_spectrum
+  id: qtgui_freq_sink_x
+  parameters:
+    type: complex
+    name: Selected AM channel
+    fftsize: '8192'
+    freqhalf: 'True'
+    wintype: window.WIN_BLACKMAN_hARRIS
+    norm_window: 'False'
+    fc: '0'
+    bw: channel_rate
+    grid: 'True'
+    autoscale: 'False'
+    average: '0.2'
+    ymin: '-140'
+    ymax: '10'
+    label: Relative level
+    units: dB
+    nconnections: '1'
+    update_time: '0.10'
+    showports: 'False'
+    gui_hint: tabs@1:0,0,1,1
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_level: '0.0'
+    tr_chan: '0'
+    tr_tag: '""'
+    ctrlpanel: 'False'
+    legend: 'True'
+    axislabels: 'True'
+    label1: ''
+    width1: '1'
+    color1: '"blue"'
+    alpha1: '1.0'
+    label2: ''''''
+    width2: '1'
+    color2: '"red"'
+    alpha2: '1.0'
+    label3: ''''''
+    width3: '1'
+    color3: '"green"'
+    alpha3: '1.0'
+    label4: ''''''
+    width4: '1'
+    color4: '"black"'
+    alpha4: '1.0'
+    label5: ''''''
+    width5: '1'
+    color5: '"cyan"'
+    alpha5: '1.0'
+    label6: ''''''
+    width6: '1'
+    color6: '"magenta"'
+    alpha6: '1.0'
+    label7: ''''''
+    width7: '1'
+    color7: '"yellow"'
+    alpha7: '1.0'
+    label8: ''''''
+    width8: '1'
+    color8: '"dark red"'
+    alpha8: '1.0'
+    label9: ''''''
+    width9: '1'
+    color9: '"dark green"'
+    alpha9: '1.0'
+    label10: ''''''
+    width10: '1'
+    color10: '"dark blue"'
+    alpha10: '1.0'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 336
+    - 704
+    rotation: 0
+    state: enabled
+- name: envelope_time
+  id: qtgui_time_sink_x
+  parameters:
+    type: float
+    name: Detected envelope (10 ms)
+    ylabel: Amplitude
+    yunit: a.u.
+    size: '480'
+    srate: channel_rate
+    grid: 'True'
+    autoscale: 'True'
+    ymin: '0'
+    ymax: '1'
+    nconnections: '1'
+    update_time: '0.10'
+    entags: 'False'
+    gui_hint: tabs@1:0,1,1,1
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_level: '0'
+    tr_delay: '0'
+    tr_chan: '0'
+    tr_tag: '""'
+    ctrlpanel: 'False'
+    legend: 'True'
+    axislabels: 'True'
+    stemplot: 'False'
+    label1: Signal
+    width1: '1'
+    color1: blue
+    style1: '1'
+    marker1: '-1'
+    alpha1: '1.0'
+    label2: Signal 2
+    width2: '1'
+    color2: red
+    style2: '1'
+    marker2: '-1'
+    alpha2: '1.0'
+    label3: Signal 3
+    width3: '1'
+    color3: green
+    style3: '1'
+    marker3: '-1'
+    alpha3: '1.0'
+    label4: Signal 4
+    width4: '1'
+    color4: black
+    style4: '1'
+    marker4: '-1'
+    alpha4: '1.0'
+    label5: Signal 5
+    width5: '1'
+    color5: cyan
+    style5: '1'
+    marker5: '-1'
+    alpha5: '1.0'
+    label6: Signal 6
+    width6: '1'
+    color6: magenta
+    style6: '1'
+    marker6: '-1'
+    alpha6: '1.0'
+    label7: Signal 7
+    width7: '1'
+    color7: yellow
+    style7: '1'
+    marker7: '-1'
+    alpha7: '1.0'
+    label8: Signal 8
+    width8: '1'
+    color8: dark red
+    style8: '1'
+    marker8: '-1'
+    alpha8: '1.0'
+    label9: Signal 9
+    width9: '1'
+    color9: dark green
+    style9: '1'
+    marker9: '-1'
+    alpha9: '1.0'
+    label10: Signal 10
+    width10: '1'
+    color10: dark blue
+    style10: '1'
+    marker10: '-1'
+    alpha10: '1.0'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 688
+    - 704
+    rotation: 0
+    state: enabled
+- name: wide_spectrum
+  id: qtgui_freq_sink_x
+  parameters:
+    type: complex
+    name: 'Find the carrier: offset from LO'
+    fftsize: '32768'
+    freqhalf: 'True'
+    wintype: window.WIN_BLACKMAN_hARRIS
+    norm_window: 'False'
+    fc: '0'
+    bw: samp_rate
+    grid: 'True'
+    autoscale: 'False'
+    average: '0.2'
+    ymin: '-140'
+    ymax: '10'
+    label: Relative level
+    units: dB
+    nconnections: '1'
+    update_time: '0.10'
+    showports: 'False'
+    gui_hint: tabs@2:0,0,1,1
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_level: '0.0'
+    tr_chan: '0'
+    tr_tag: '""'
+    ctrlpanel: 'False'
+    legend: 'True'
+    axislabels: 'True'
+    label1: ''
+    width1: '1'
+    color1: '"blue"'
+    alpha1: '1.0'
+    label2: ''''''
+    width2: '1'
+    color2: '"red"'
+    alpha2: '1.0'
+    label3: ''''''
+    width3: '1'
+    color3: '"green"'
+    alpha3: '1.0'
+    label4: ''''''
+    width4: '1'
+    color4: '"black"'
+    alpha4: '1.0'
+    label5: ''''''
+    width5: '1'
+    color5: '"cyan"'
+    alpha5: '1.0'
+    label6: ''''''
+    width6: '1'
+    color6: '"magenta"'
+    alpha6: '1.0'
+    label7: ''''''
+    width7: '1'
+    color7: '"yellow"'
+    alpha7: '1.0'
+    label8: ''''''
+    width8: '1'
+    color8: '"dark red"'
+    alpha8: '1.0'
+    label9: ''''''
+    width9: '1'
+    color9: '"dark green"'
+    alpha9: '1.0'
+    label10: ''''''
+    width10: '1'
+    color10: '"dark blue"'
+    alpha10: '1.0'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 16
+    - 864
+    rotation: 0
+    state: enabled
+connections:
+- - pluto_rx
+  - '0'
+  - select_channel
+  - '0'
+- - select_channel
+  - '0'
+  - envelope_detector
+  - '0'
+- - envelope_detector
+  - '0'
+  - remove_dc
+  - '0'
+- - remove_dc
+  - '0'
+  - message_filter
+  - '0'
+- - message_filter
+  - '0'
+  - recovered_time
+  - '0'
+- - message_filter
+  - '0'
+  - recovered_spectrum
+  - '0'
+- - select_channel
+  - '0'
+  - channel_spectrum
+  - '0'
+- - envelope_detector
+  - '0'
+  - envelope_time
+  - '0'
+- - pluto_rx
+  - '0'
+  - wide_spectrum
+  - '0'
+metadata:
+  file_format: 1
+  grc_version: 3.10.12.0

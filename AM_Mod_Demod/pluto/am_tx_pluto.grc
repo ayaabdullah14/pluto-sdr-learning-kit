@@ -1,0 +1,903 @@
+options:
+  parameters:
+    title: AM TX - message and envelope
+    author: Aya
+    copyright: ''
+    description: 'AM TX v2: native GNU Radio blocks, ka control, explicit carrier
+      and signed envelope.'
+    output_language: python
+    generate_options: qt_gui
+    gen_linking: dynamic
+    gen_cmake: 'On'
+    cmake_opt: ''
+    category: '[GRC Hier Blocks]'
+    run_options: prompt
+    placement: (0,0)
+    window_size: (1200,800)
+    sizing_mode: fixed
+    run: 'True'
+    max_nouts: '0'
+    realtime_scheduling: ''
+    qt_qss_theme: ''
+    thread_safe_setters: ''
+    catch_exceptions: 'True'
+    run_command: '{python} -u {filename}'
+    hier_block_src_path: '.:'
+    id: am_tx_pluto_v2
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 16
+    - 16
+    rotation: 0
+    state: enabled
+blocks:
+- name: samp_rate
+  id: variable
+  parameters:
+    value: '2400000'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 16
+    - 96
+    rotation: 0
+    state: enabled
+- name: lo_freq
+  id: variable
+  parameters:
+    value: '2450000000'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 192
+    - 96
+    rotation: 0
+    state: enabled
+- name: carrier_offset
+  id: variable
+  parameters:
+    value: '200000'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 384
+    - 96
+    rotation: 0
+    state: enabled
+- name: carrier_amp
+  id: variable
+  parameters:
+    value: '0.35'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 576
+    - 96
+    rotation: 0
+    state: enabled
+- name: msg_amp
+  id: variable
+  parameters:
+    value: '1.0'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 768
+    - 96
+    rotation: 0
+    state: enabled
+- name: pluto_uri
+  id: variable
+  parameters:
+    value: ''''''
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 944
+    - 96
+    rotation: 0
+    state: enabled
+- name: channel_rate
+  id: variable
+  parameters:
+    value: samp_rate // 50
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1136
+    - 96
+    rotation: 0
+    state: enabled
+- name: mu
+  id: variable
+  parameters:
+    value: ka * msg_amp
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1328
+    - 96
+    rotation: 0
+    state: enabled
+- name: ka
+  id: variable_qtgui_range
+  parameters:
+    label: 'ka (Am=1: modulation index = ka)'
+    rangeType: float
+    value: '0.5'
+    start: '0'
+    stop: '1.4'
+    step: '0.05'
+    widget: counter_slider
+    orient: QtCore.Qt.Horizontal
+    min_len: '220'
+    gui_hint: 0,0,1,1
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 16
+    - 200
+    rotation: 0
+    state: enabled
+- name: message_freq
+  id: variable_qtgui_range
+  parameters:
+    label: Message frequency (Hz)
+    rangeType: float
+    value: '1000'
+    start: '200'
+    stop: '3000'
+    step: '100'
+    widget: counter_slider
+    orient: QtCore.Qt.Horizontal
+    min_len: '220'
+    gui_hint: 0,1,1,1
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 304
+    - 200
+    rotation: 0
+    state: enabled
+- name: tx_atten
+  id: variable_qtgui_range
+  parameters:
+    label: TX attenuation (dB; larger = weaker)
+    rangeType: float
+    value: '40'
+    start: '10'
+    stop: '70'
+    step: '1'
+    widget: counter_slider
+    orient: QtCore.Qt.Horizontal
+    min_len: '220'
+    gui_hint: 0,2,1,1
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 592
+    - 200
+    rotation: 0
+    state: enabled
+- name: tabs
+  id: qtgui_tab_widget
+  parameters:
+    num_tabs: '3'
+    label0: 1 AM + envelope
+    label1: 2 Message + carrier
+    label2: 3 TX spectrum
+    label3: Tab 3
+    label4: Tab 4
+    label5: Tab 5
+    label6: Tab 6
+    label7: Tab 7
+    label8: Tab 8
+    label9: Tab 9
+    label10: Tab 10
+    label11: Tab 11
+    label12: Tab 12
+    label13: Tab 13
+    label14: Tab 14
+    label15: Tab 15
+    label16: Tab 16
+    label17: Tab 17
+    label18: Tab 18
+    label19: Tab 19
+    gui_hint: 1,0,1,3
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 928
+    - 192
+    rotation: 0
+    state: enabled
+- name: message
+  id: analog_sig_source_x
+  parameters:
+    type: float
+    samp_rate: samp_rate
+    waveform: analog.GR_COS_WAVE
+    freq: message_freq
+    amp: msg_amp
+    offset: '0'
+    phase: '0'
+    showports: 'False'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 16
+    - 384
+    rotation: 0
+    state: enabled
+- name: scale_ka
+  id: blocks_multiply_const_vxx
+  parameters:
+    type: float
+    const: ka
+    vlen: '1'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 256
+    - 400
+    rotation: 0
+    state: enabled
+- name: add_one
+  id: blocks_add_const_vxx
+  parameters:
+    type: float
+    const: '1.0'
+    vlen: '1'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 464
+    - 400
+    rotation: 0
+    state: enabled
+- name: scale_carrier
+  id: blocks_multiply_const_vxx
+  parameters:
+    type: float
+    const: carrier_amp
+    vlen: '1'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 656
+    - 400
+    rotation: 0
+    state: enabled
+- name: real_envelope_to_complex
+  id: blocks_float_to_complex
+  parameters:
+    vlen: '1'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 880
+    - 400
+    rotation: 0
+    state: enabled
+- name: am_modulator
+  id: blocks_multiply_xx
+  parameters:
+    type: complex
+    num_inputs: '2'
+    vlen: '1'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1088
+    - 400
+    rotation: 0
+    state: enabled
+- name: carrier
+  id: analog_sig_source_x
+  parameters:
+    type: complex
+    samp_rate: samp_rate
+    waveform: analog.GR_COS_WAVE
+    freq: carrier_offset
+    amp: '1.0'
+    offset: '0'
+    phase: '0'
+    showports: 'False'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 848
+    - 576
+    rotation: 0
+    state: enabled
+- name: pluto_tx
+  id: iio_pluto_sink
+  parameters:
+    type: fc32
+    uri: pluto_uri
+    frequency: int(lo_freq)
+    samplerate: int(samp_rate)
+    buffer_size: '32768'
+    cyclic: 'False'
+    attenuation1: tx_atten
+    len_tag_key: ''
+    filter_source: '''Auto'''
+    filter: ''
+    fpass: '0'
+    fstop: '0'
+    bandwidth: '2000000'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1296
+    - 352
+    rotation: 0
+    state: enabled
+- name: am_real
+  id: blocks_complex_to_real
+  parameters:
+    vlen: '1'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1120
+    - 704
+    rotation: 0
+    state: enabled
+- name: lower_envelope
+  id: blocks_multiply_const_vxx
+  parameters:
+    type: float
+    const: '-1.0'
+    vlen: '1'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 640
+    - 704
+    rotation: 0
+    state: enabled
+- name: am_view
+  id: qtgui_time_sink_x
+  parameters:
+    type: float
+    name: AM wave and signed envelope
+    ylabel: Amplitude
+    yunit: a.u.
+    size: '7200'
+    srate: samp_rate
+    grid: 'True'
+    autoscale: 'False'
+    ymin: '-1'
+    ymax: '1'
+    nconnections: '3'
+    update_time: '0.10'
+    entags: 'False'
+    gui_hint: tabs@0:0,0,1,1
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_level: '0'
+    tr_delay: '0'
+    tr_chan: '0'
+    tr_tag: '""'
+    ctrlpanel: 'False'
+    legend: 'True'
+    axislabels: 'True'
+    stemplot: 'False'
+    label1: AM real part
+    width1: '1'
+    color1: blue
+    style1: '1'
+    marker1: '-1'
+    alpha1: '1.0'
+    label2: +A(t)
+    width2: '1'
+    color2: red
+    style2: '1'
+    marker2: '-1'
+    alpha2: '1.0'
+    label3: -A(t)
+    width3: '1'
+    color3: dark green
+    style3: '1'
+    marker3: '-1'
+    alpha3: '1.0'
+    label4: Signal 4
+    width4: '1'
+    color4: black
+    style4: '1'
+    marker4: '-1'
+    alpha4: '1.0'
+    label5: Signal 5
+    width5: '1'
+    color5: cyan
+    style5: '1'
+    marker5: '-1'
+    alpha5: '1.0'
+    label6: Signal 6
+    width6: '1'
+    color6: magenta
+    style6: '1'
+    marker6: '-1'
+    alpha6: '1.0'
+    label7: Signal 7
+    width7: '1'
+    color7: yellow
+    style7: '1'
+    marker7: '-1'
+    alpha7: '1.0'
+    label8: Signal 8
+    width8: '1'
+    color8: dark red
+    style8: '1'
+    marker8: '-1'
+    alpha8: '1.0'
+    label9: Signal 9
+    width9: '1'
+    color9: dark green
+    style9: '1'
+    marker9: '-1'
+    alpha9: '1.0'
+    label10: Signal 10
+    width10: '1'
+    color10: dark blue
+    style10: '1'
+    marker10: '-1'
+    alpha10: '1.0'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 848
+    - 848
+    rotation: 0
+    state: enabled
+- name: message_view
+  id: qtgui_time_sink_x
+  parameters:
+    type: float
+    name: Original message
+    ylabel: Amplitude
+    yunit: a.u.
+    size: '7200'
+    srate: samp_rate
+    grid: 'True'
+    autoscale: 'False'
+    ymin: '-1.2'
+    ymax: '1.2'
+    nconnections: '1'
+    update_time: '0.10'
+    entags: 'False'
+    gui_hint: tabs@1:0,0,1,1
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_level: '0'
+    tr_delay: '0'
+    tr_chan: '0'
+    tr_tag: '""'
+    ctrlpanel: 'False'
+    legend: 'True'
+    axislabels: 'True'
+    stemplot: 'False'
+    label1: Signal
+    width1: '1'
+    color1: blue
+    style1: '1'
+    marker1: '-1'
+    alpha1: '1.0'
+    label2: Signal 2
+    width2: '1'
+    color2: red
+    style2: '1'
+    marker2: '-1'
+    alpha2: '1.0'
+    label3: Signal 3
+    width3: '1'
+    color3: green
+    style3: '1'
+    marker3: '-1'
+    alpha3: '1.0'
+    label4: Signal 4
+    width4: '1'
+    color4: black
+    style4: '1'
+    marker4: '-1'
+    alpha4: '1.0'
+    label5: Signal 5
+    width5: '1'
+    color5: cyan
+    style5: '1'
+    marker5: '-1'
+    alpha5: '1.0'
+    label6: Signal 6
+    width6: '1'
+    color6: magenta
+    style6: '1'
+    marker6: '-1'
+    alpha6: '1.0'
+    label7: Signal 7
+    width7: '1'
+    color7: yellow
+    style7: '1'
+    marker7: '-1'
+    alpha7: '1.0'
+    label8: Signal 8
+    width8: '1'
+    color8: dark red
+    style8: '1'
+    marker8: '-1'
+    alpha8: '1.0'
+    label9: Signal 9
+    width9: '1'
+    color9: dark green
+    style9: '1'
+    marker9: '-1'
+    alpha9: '1.0'
+    label10: Signal 10
+    width10: '1'
+    color10: dark blue
+    style10: '1'
+    marker10: '-1'
+    alpha10: '1.0'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 16
+    - 704
+    rotation: 0
+    state: enabled
+- name: carrier_real
+  id: blocks_complex_to_real
+  parameters:
+    vlen: '1'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 352
+    - 704
+    rotation: 0
+    state: enabled
+- name: carrier_view
+  id: qtgui_time_sink_x
+  parameters:
+    type: float
+    name: Carrier zoom (40 us)
+    ylabel: Amplitude
+    yunit: a.u.
+    size: '96'
+    srate: samp_rate
+    grid: 'True'
+    autoscale: 'False'
+    ymin: '-1.2'
+    ymax: '1.2'
+    nconnections: '1'
+    update_time: '0.10'
+    entags: 'False'
+    gui_hint: tabs@1:0,1,1,1
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_level: '0'
+    tr_delay: '0'
+    tr_chan: '0'
+    tr_tag: '""'
+    ctrlpanel: 'False'
+    legend: 'True'
+    axislabels: 'True'
+    stemplot: 'False'
+    label1: Signal
+    width1: '1'
+    color1: blue
+    style1: '1'
+    marker1: '-1'
+    alpha1: '1.0'
+    label2: Signal 2
+    width2: '1'
+    color2: red
+    style2: '1'
+    marker2: '-1'
+    alpha2: '1.0'
+    label3: Signal 3
+    width3: '1'
+    color3: green
+    style3: '1'
+    marker3: '-1'
+    alpha3: '1.0'
+    label4: Signal 4
+    width4: '1'
+    color4: black
+    style4: '1'
+    marker4: '-1'
+    alpha4: '1.0'
+    label5: Signal 5
+    width5: '1'
+    color5: cyan
+    style5: '1'
+    marker5: '-1'
+    alpha5: '1.0'
+    label6: Signal 6
+    width6: '1'
+    color6: magenta
+    style6: '1'
+    marker6: '-1'
+    alpha6: '1.0'
+    label7: Signal 7
+    width7: '1'
+    color7: yellow
+    style7: '1'
+    marker7: '-1'
+    alpha7: '1.0'
+    label8: Signal 8
+    width8: '1'
+    color8: dark red
+    style8: '1'
+    marker8: '-1'
+    alpha8: '1.0'
+    label9: Signal 9
+    width9: '1'
+    color9: dark green
+    style9: '1'
+    marker9: '-1'
+    alpha9: '1.0'
+    label10: Signal 10
+    width10: '1'
+    color10: dark blue
+    style10: '1'
+    marker10: '-1'
+    alpha10: '1.0'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 352
+    - 848
+    rotation: 0
+    state: enabled
+- name: spectrum_channel
+  id: freq_xlating_fir_filter_xxx
+  parameters:
+    type: ccf
+    decim: '50'
+    taps: firdes.low_pass(1.0, samp_rate, 15000, 5000, window.WIN_HAMMING)
+    center_freq: carrier_offset
+    samp_rate: samp_rate
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1120
+    - 896
+    rotation: 0
+    state: enabled
+- name: tx_spectrum
+  id: qtgui_freq_sink_x
+  parameters:
+    type: complex
+    name: Carrier and sidebands
+    fftsize: '8192'
+    freqhalf: 'True'
+    wintype: window.WIN_BLACKMAN_hARRIS
+    norm_window: 'False'
+    fc: carrier_offset
+    bw: channel_rate
+    grid: 'True'
+    autoscale: 'False'
+    average: '0.2'
+    ymin: '-140'
+    ymax: '10'
+    label: Relative level
+    units: dB
+    nconnections: '1'
+    update_time: '0.10'
+    showports: 'False'
+    gui_hint: tabs@2:0,0,1,1
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_level: '0.0'
+    tr_chan: '0'
+    tr_tag: '""'
+    ctrlpanel: 'False'
+    legend: 'True'
+    axislabels: 'True'
+    label1: ''
+    width1: '1'
+    color1: '"blue"'
+    alpha1: '1.0'
+    label2: ''''''
+    width2: '1'
+    color2: '"red"'
+    alpha2: '1.0'
+    label3: ''''''
+    width3: '1'
+    color3: '"green"'
+    alpha3: '1.0'
+    label4: ''''''
+    width4: '1'
+    color4: '"black"'
+    alpha4: '1.0'
+    label5: ''''''
+    width5: '1'
+    color5: '"cyan"'
+    alpha5: '1.0'
+    label6: ''''''
+    width6: '1'
+    color6: '"magenta"'
+    alpha6: '1.0'
+    label7: ''''''
+    width7: '1'
+    color7: '"yellow"'
+    alpha7: '1.0'
+    label8: ''''''
+    width8: '1'
+    color8: '"dark red"'
+    alpha8: '1.0'
+    label9: ''''''
+    width9: '1'
+    color9: '"dark green"'
+    alpha9: '1.0'
+    label10: ''''''
+    width10: '1'
+    color10: '"dark blue"'
+    alpha10: '1.0'
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1296
+    - 1072
+    rotation: 0
+    state: enabled
+connections:
+- - message
+  - '0'
+  - scale_ka
+  - '0'
+- - scale_ka
+  - '0'
+  - add_one
+  - '0'
+- - add_one
+  - '0'
+  - scale_carrier
+  - '0'
+- - scale_carrier
+  - '0'
+  - real_envelope_to_complex
+  - '0'
+- - real_envelope_to_complex
+  - '0'
+  - am_modulator
+  - '0'
+- - am_modulator
+  - '0'
+  - pluto_tx
+  - '0'
+- - am_modulator
+  - '0'
+  - am_real
+  - '0'
+- - am_real
+  - '0'
+  - am_view
+  - '0'
+- - scale_carrier
+  - '0'
+  - lower_envelope
+  - '0'
+- - message
+  - '0'
+  - message_view
+  - '0'
+- - carrier
+  - '0'
+  - carrier_real
+  - '0'
+- - carrier_real
+  - '0'
+  - carrier_view
+  - '0'
+- - am_modulator
+  - '0'
+  - spectrum_channel
+  - '0'
+- - spectrum_channel
+  - '0'
+  - tx_spectrum
+  - '0'
+- - carrier
+  - '0'
+  - am_modulator
+  - '1'
+- - scale_carrier
+  - '0'
+  - am_view
+  - '1'
+- - lower_envelope
+  - '0'
+  - am_view
+  - '2'
+metadata:
+  file_format: 1
+  grc_version: 3.10.12.0
